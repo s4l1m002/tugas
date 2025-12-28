@@ -57,7 +57,7 @@
                                 @endif
                             </div>
                             <div class="flex items-center gap-2">
-                                <form action="{{ route('transactions.confirm.admin', $tx->id) }}" method="POST">
+                                <form action="{{ route('admin.transactions.confirm.admin', $tx->id) }}" method="POST">
                                     @csrf
                                     <button class="px-3 py-1 bg-green-600 text-white rounded">Konfirmasi Lunas</button>
                                 </form>

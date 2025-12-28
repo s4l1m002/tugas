@@ -22,9 +22,13 @@ class PropertyController extends Controller
     // Tampilkan detail properti
     public function show(Property $property)
     {
-        // cek pemilik atau admin dengan cara yang Intelephense paham
-        $isOwner = Auth::check() && Auth::id() === $property->user_id;
-        $isAdmin = Auth::check() && (Auth::user()->role === 'admin');
+        // cek pemilik atau admin/ketua dengan cara yang Intelephense paham
+        $isOwner = false;
+        if (Auth::check()) {
+            $isOwner = Auth::id() === ($property->marketing_id ?? $property->user_id ?? null);
+        }
+
+        $isAdmin = Auth::check() && in_array(Auth::user()->role, ['admin', 'ketua']);
 
         $hasTransactionForUser = false;
         if (Auth::check()) {
