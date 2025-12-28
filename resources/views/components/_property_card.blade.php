@@ -1,4 +1,7 @@
 <div class="card">
+    @if(!empty($property->is_sold))
+        <div style="position: absolute; right: 12px; top: 12px; background: rgba(220,38,38,0.9); color: #fff; padding:6px 10px; border-radius:4px; font-weight:700; z-index:20">SOLD OUT</div>
+    @endif
     @if ($property->gambar)
         @php
             $img = str_starts_with($property->gambar, 'storage/') ? asset($property->gambar) : asset('storage/' . ltrim($property->gambar, '/'));
@@ -19,7 +22,7 @@
             Luas: LT {{ $property->luas_tanah }}m² / LB {{ $property->luas_bangunan }}m²
         </p>
 
-        <a href="{{ route('property.show', $property->id) }}" style="display: block; text-align: center; background-color: #3182ce; color: white; padding: 10px; border-radius: 4px; text-decoration: none; margin-top: 10px;">
+        <a href="{{ route('properties.show', $property->id) }}" style="display: block; text-align: center; background-color: #3182ce; color: white; padding: 10px; border-radius: 4px; text-decoration: none; margin-top: 10px;">
             Lihat Detail
         </a>
         

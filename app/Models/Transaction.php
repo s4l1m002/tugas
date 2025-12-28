@@ -22,6 +22,7 @@ class Transaction extends Model
         'pelanggan_id',
         'pembayaran_metode',
         'pembayaran_rekening',
+        'bukti',
     ];
 
     public function property()

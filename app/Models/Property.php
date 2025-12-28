@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
+use App\Models\Transaction;
 
 /**
  * App\Models\Property
@@ -74,6 +75,30 @@ class Property extends Model
         }
 
         return User::find($ownerId);
+    }
+
+    /**
+     * Relasi ke transaksi yang terkait dengan properti ini.
+     */
+    public function transactions()
+    {
+        return $this->hasMany(Transaction::class, 'property_id');
+    }
+
+    /**
+     * Apakah properti sudah terjual (ada transaksi berstatus 'paid').
+     */
+    public function isSold()
+    {
+        return $this->transactions()->where('status_pembayaran', 'paid')->exists();
+    }
+
+    /**
+     * Akses dinamika untuk memeriksa sold status dari blade: $property->is_sold
+     */
+    public function getIsSoldAttribute()
+    {
+        return $this->isSold();
     }
 
     // Anda bisa menambahkan relasi lain di sini jika diperlukan

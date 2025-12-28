@@ -104,7 +104,11 @@
                     
                         {{-- Opsi: Pelanggan setuju -> buat transaksi & bayar --}}
                         <div class="mt-4">
-                            <a href="{{ route('transactions.purchase.form', $property->id) }}" class="block text-center bg-green-600 text-white py-2 rounded-md hover:bg-green-700">Saya Setuju, Lanjut ke Pembayaran</a>
+                            @if($property->is_sold)
+                                <div class="px-4 py-3 bg-red-100 border border-red-300 rounded text-red-700 font-semibold text-center">SOLD OUT — Properti ini sudah terjual.</div>
+                            @else
+                                <a href="{{ route('transactions.purchase.form', $property->id) }}" class="block text-center bg-green-600 text-white py-2 rounded-md hover:bg-green-700">Saya Setuju, Lanjut ke Pembayaran</a>
+                            @endif
                         </div>
                     @else
                         {{-- Marketing/Admin/Pajak tidak bisa kontak --}}

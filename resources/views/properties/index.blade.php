@@ -17,6 +17,11 @@
                     <a href="{{ route('register') }}" class="px-3 py-1 border rounded">Register</a>
                 @else
                     <span class="px-3 py-1">Hi, {{ auth()->user()->name }}</span>
+                    @if(auth()->user()->role === 'pelanggan')
+                        <a href="{{ route('properties.index') }}" class="ml-2 px-3 py-1 bg-green-500 rounded text-sm">Beli</a>
+                        <a href="{{ route('notifications.index') }}" class="ml-2 px-3 py-1 bg-blue-500 rounded text-sm">Notifikasi</a>
+                        <a href="{{ route('transactions.my') }}" class="ml-2 px-3 py-1 bg-purple-600 rounded text-sm text-white">Transaksi</a>
+                    @endif
                     <form class="inline" action="{{ route('logout') }}" method="POST">@csrf<button class="px-3 py-1 bg-red-600 rounded">Logout</button></form>
                 @endguest
             </div>
@@ -54,8 +59,8 @@
                     <p class="text-sm text-gray-600 mb-2">IDR {{ number_format($p->harga,0,',','.') }}</p>
                     <div class="flex justify-between items-center">
                         <a href="{{ route('properties.show', $p->id) }}" class="text-indigo-600 text-sm">Detail</a>
-                        @if($p->status === 'sold')
-                            <span class="text-red-600 font-bold">SOLD</span>
+                        @if($p->status === 'sold' || !empty($p->is_sold))
+                            <span class="text-red-600 font-bold">SOLD OUT</span>
                         @endif
                     </div>
                 </div>

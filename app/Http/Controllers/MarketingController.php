@@ -71,8 +71,16 @@ class MarketingController extends Controller
         $filename = $base . '_' . time() . '_' . uniqid() . '.' . $ext;
 
         try {
-            Storage::putFileAs('public/properties', $file, $filename);
+            // Simpan ke disk 'public' di folder 'properties'
+            Storage::disk('public')->putFileAs('properties', $file, $filename);
             $imagePath = 'storage/properties/' . $filename; // path stored in DB and used by views
+
+            // Verifikasi file berhasil tersimpan
+            if (! Storage::disk('public')->exists('properties/' . $filename)) {
+                Log::error('Property image not found after storing', ['filename' => $filename]);
+                return Redirect::back()->with('error', 'Gagal menyimpan gambar (file tidak ditemukan setelah upload). Silakan coba lagi.');
+            }
+
             Log::info('Property image stored', ['filename' => $filename, 'path' => $imagePath]);
         } catch (\Exception $e) {
             Log::error('Failed to store property image: ' . $e->getMessage());

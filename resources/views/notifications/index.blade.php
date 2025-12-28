@@ -22,7 +22,10 @@
             @foreach($unread as $note)
                 <li class="p-3 bg-white border rounded flex justify-between items-start">
                     <div>
-                        <p class="text-sm">{!! $note->data['text'] ?? 'Notifikasi baru' !!}</p>
+                        @php
+                            $body = $note->data['text'] ?? $note->data['message'] ?? 'Notifikasi baru';
+                        @endphp
+                        <p class="text-sm">{!! $body !!}</p>
                         <p class="text-xs text-gray-400 mt-1">{{ $note->created_at->diffForHumans() }}</p>
                     </div>
                     <form action="{{ route('notifications.read', $note->id) }}" method="POST">

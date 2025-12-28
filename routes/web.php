@@ -94,11 +94,20 @@ Route::middleware('auth')->group(function () {
         // ROUTE TRANSAKSI
         Route::get('/transaction/create/{property}', [TransactionController::class, 'create'])->name('transactions.create');
         Route::post('/transaction/{property}', [TransactionController::class, 'store'])->name('transactions.store');
+        // Admin confirm transaction (mark as paid)
+        Route::post('/transaction/{transaction}/confirm', [TransactionController::class, 'adminConfirm'])->name('transactions.confirm.admin');
     });
 
     // Pelanggan: purchase routes (setuju -> pilih metode pembayaran)
     Route::get('/property/{property}/purchase', [TransactionController::class, 'purchaseForm'])->name('transactions.purchase.form');
     Route::post('/property/{property}/purchase', [TransactionController::class, 'purchase'])->name('transactions.purchase');
+    // Pelanggan: lihat transaksi milik sendiri
+    Route::get('/my-transactions', [TransactionController::class, 'myTransactions'])->name('transactions.my');
+    // Pelanggan: form buat transaksi (pilih property + metode pembayaran)
+    Route::get('/transactions/create', [TransactionController::class, 'createForCustomer'])->name('transactions.create.form');
+    Route::post('/transactions', [TransactionController::class, 'storeCustomer'])->name('transactions.store.customer');
+    // Customer confirm payment (for cash)
+    Route::post('/transactions/{transaction}/confirm', [TransactionController::class, 'customerConfirm'])->name('transactions.confirm.customer');
 });
 
 // Development helper: tambahkan default users (lokal saja)

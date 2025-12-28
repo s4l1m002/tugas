@@ -41,6 +41,13 @@
                     <p class="text-sm font-bold text-gray-900">{{ Auth::user()->name }}</p>
                     <p class="text-xs text-gray-500 uppercase tracking-wider">Pengguna Terdaftar</p>
                 </div>
+                @if(Auth::user()->role === 'pelanggan')
+                    <div class="mr-3 flex items-center gap-2">
+                        <a href="{{ route('properties.index') }}" class="px-3 py-1 bg-green-600 text-white rounded text-sm">Beli</a>
+                        <a href="{{ route('notifications.index') }}" class="px-3 py-1 bg-blue-600 text-white rounded text-sm">Notifikasi</a>
+                        <a href="{{ route('transactions.my') }}" class="px-3 py-1 bg-purple-600 text-white rounded text-sm">Transaksi</a>
+                    </div>
+                @endif
                 {{-- Notifikasi link --}}
                 <div class="mr-3">
                     <a href="{{ route('notifications.index') }}" class="flex items-center gap-2 text-sm text-gray-700">

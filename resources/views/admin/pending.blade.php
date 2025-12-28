@@ -39,6 +39,39 @@
             </div>
         @endif
 
+        {{-- Daftar Transaksi yang perlu dikonfirmasi (admin/ketua) --}}
+        <div class="mt-8">
+            <h2 class="text-xl font-semibold mb-4">Transaksi - Menunggu Konfirmasi Pembayaran</h2>
+            @if(isset($transactions) && $transactions->isEmpty())
+                <div class="p-4 bg-white rounded shadow">Tidak ada transaksi yang menunggu konfirmasi.</div>
+            @else
+                <div class="space-y-4">
+                    @foreach($transactions as $tx)
+                        <div class="bg-white p-4 rounded shadow flex justify-between items-center">
+                            <div>
+                                <a href="{{ route('properties.show', $tx->property_id) }}" class="font-semibold text-indigo-700">{{ $tx->property->judul ?? 'Properti #' . $tx->property_id }}</a>
+                                <div class="text-sm text-gray-600">Pelanggan ID: {{ $tx->pelanggan_id }}</div>
+                                <div class="text-sm text-gray-600">Metode: {{ ucfirst($tx->pembayaran_metode ?? '-') }} {{ $tx->pembayaran_rekening ? '(Rek: ' . $tx->pembayaran_rekening . ')' : '' }}</div>
+                                @if($tx->bukti)
+                                    <div class="text-sm mt-1">Bukti: <a href="{{ asset($tx->bukti) }}" target="_blank" class="text-blue-600">Lihat Bukti</a></div>
+                                @endif
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <form action="{{ route('transactions.confirm.admin', $tx->id) }}" method="POST">
+                                    @csrf
+                                    <button class="px-3 py-1 bg-green-600 text-white rounded">Konfirmasi Lunas</button>
+                                </form>
+                                <form action="{{ route('admin.reject', $tx->property_id) }}" method="POST">
+                                    @csrf
+                                    <button class="px-3 py-1 bg-red-500 text-white rounded">Tolak</button>
+                                </form>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+        </div>
+
         <div class="mt-6">
             <a href="{{ route('home') }}" class="text-sm text-blue-600">Kembali</a>
         </div>

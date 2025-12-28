@@ -40,6 +40,27 @@
             </button>
         </form>
 
+        <div class="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+            {{-- Tombol untuk menjelajahi properti (tersedia untuk semua user/logged out) --}}
+            <a href="{{ route('properties.index') }}" class="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition">
+                Jelajahi Properti / Beli
+            </a>
+
+            {{-- Tombol khusus Pelanggan: langsung ke daftar pembelian / notifikasi pembayaran --}}
+            @if(Auth::check() && Auth::user()->role === 'pelanggan')
+                <a href="{{ route('notifications.index') }}" class="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition">
+                    Pembayaran & Notifikasi
+                </a>
+            @else
+                {{-- Jika belum login, tampilkan tombol yang mengarahkan ke login --}}
+                @if(! Auth::check())
+                    <a href="{{ route('login') }}" class="inline-flex items-center justify-center px-6 py-3 rounded-lg bg-gray-600 text-white font-semibold hover:bg-gray-700 transition">
+                        Login sebagai Pelanggan
+                    </a>
+                @endif
+            @endif
+        </div>
+
     </div>
 
 </body>

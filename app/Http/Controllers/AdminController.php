@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Property; // Pastikan Model Property di-import dengan benar
 use App\Models\User; // Asumsi jika ingin menampilkan nama marketing
+use App\Models\Transaction;
 use App\Notifications\PropertyStatusChanged;
 
 class AdminController extends Controller
@@ -23,7 +24,13 @@ class AdminController extends Controller
                              ->latest()
                              ->get();
 
-        return view('admin.pending', compact('properties'));
+        // Ambil semua transaksi yang dilaporkan pembayaran (submitted) agar admin bisa konfirmasi
+        $transactions = Transaction::where('status_pembayaran', 'submitted')
+            ->with('property')
+            ->latest()
+            ->get();
+
+        return view('admin.pending', compact('properties', 'transactions'));
     }
 
     /**

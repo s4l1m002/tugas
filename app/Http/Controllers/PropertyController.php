@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Property;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth; // <-- pakai Facade agar Intelephense paham
 
@@ -25,7 +26,14 @@ class PropertyController extends Controller
         $isOwner = Auth::check() && Auth::id() === $property->user_id;
         $isAdmin = Auth::check() && (Auth::user()->role === 'admin');
 
-        if ($property->status !== 'published' && ! $isOwner && ! $isAdmin) {
+        $hasTransactionForUser = false;
+        if (Auth::check()) {
+            $hasTransactionForUser = Transaction::where('property_id', $property->id)
+                ->where('pelanggan_id', Auth::id())
+                ->exists();
+        }
+
+        if ($property->status !== 'published' && ! $isOwner && ! $isAdmin && ! $hasTransactionForUser) {
             abort(404);
         }
 

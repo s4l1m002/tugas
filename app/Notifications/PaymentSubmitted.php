@@ -32,6 +32,8 @@ class PaymentSubmitted extends Notification
             'payment_method' => $this->transaction->pembayaran_metode,
             'rekening' => $this->transaction->pembayaran_rekening,
             'message' => 'Pelanggan telah mengirim bukti pembayaran untuk properti ID ' . $this->transaction->property_id,
+            // For compatibility with notification view, include a rendered text/html snippet
+            'text' => '<strong>Pembayaran Diterima</strong><br>Pelanggan telah melaporkan pembayaran untuk properti <a href="' . url('/property/' . $this->transaction->property_id) . '">#' . $this->transaction->property_id . '</a>. Metode: ' . htmlspecialchars($this->transaction->pembayaran_metode) . ($this->transaction->pembayaran_rekening ? ' (Rek: ' . htmlspecialchars($this->transaction->pembayaran_rekening) . ')' : ''),
         ];
     }
 }
