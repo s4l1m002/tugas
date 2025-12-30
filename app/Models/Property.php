@@ -49,6 +49,7 @@ class Property extends Model
         'luas_bangunan',
         'gambar',
         'status',
+        'visited',
         'marketing_id',
         'user_id',
     ];

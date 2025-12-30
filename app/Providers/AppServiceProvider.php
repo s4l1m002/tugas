@@ -38,5 +38,10 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('isUser', function ($user) {
             return $user->role === 'user';
         });
+
+        // 4. Definisikan Gate untuk Ketua atau Admin (akses laporan)
+        Gate::define('isKetuaOrAdmin', function ($user) {
+            return in_array($user->role, ['ketua', 'admin']);
+        });
     }
 }

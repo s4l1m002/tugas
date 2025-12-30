@@ -71,6 +71,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/create', [MarketingController::class, 'create'])->name('create');
         Route::post('/', [MarketingController::class, 'store'])->name('store');
         Route::delete('/{property}', [MarketingController::class, 'destroy'])->name('destroy');
+        Route::post('/{property}/visited', [MarketingController::class, 'markVisited'])->name('mark.visited');
         Route::get('/profile', [\App\Http\Controllers\Auth\ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [\App\Http\Controllers\Auth\ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [\App\Http\Controllers\Auth\ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -96,6 +97,18 @@ Route::middleware('auth')->group(function () {
         Route::post('/transaction/{property}', [TransactionController::class, 'store'])->name('transactions.store');
         // Admin confirm transaction (mark as paid)
         Route::post('/transaction/{transaction}/confirm', [TransactionController::class, 'adminConfirm'])->name('transactions.confirm.admin');
+
+        // ROUTE LAPORAN KHUSUS KETUA
+        Route::middleware('can:isKetuaOrAdmin')->prefix('reports')->name('reports.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\ReportController::class, 'index'])->name('index');
+            Route::get('/transactions', [\App\Http\Controllers\ReportController::class, 'transactions'])->name('transactions');
+            Route::get('/commissions', [\App\Http\Controllers\ReportController::class, 'commissions'])->name('commissions');
+            Route::get('/visits', [\App\Http\Controllers\ReportController::class, 'visits'])->name('visits');
+            Route::get('/documents', [\App\Http\Controllers\ReportController::class, 'documents'])->name('documents');
+            Route::get('/taxes', [\App\Http\Controllers\ReportController::class, 'taxes'])->name('taxes');
+            // Printable versions
+            Route::get('/transactions/print', [\App\Http\Controllers\ReportController::class, 'printTransactions'])->name('transactions.print');
+        });
     });
 
     // Pelanggan: purchase routes (setuju -> pilih metode pembayaran)

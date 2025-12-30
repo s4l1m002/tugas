@@ -150,4 +150,19 @@ class MarketingController extends Controller
 
         return redirect()->route('marketing.properties.index')->with('success', 'Properti berhasil dihapus.');
     }
+
+    // Tandai properti sebagai sudah dikunjungi oleh marketing yang sedang login
+    public function markVisited(Property $property)
+    {
+        $ownerColumn = \Illuminate\Support\Facades\Schema::hasColumn('properties', 'marketing_id') ? 'marketing_id' : 'user_id';
+
+        if ((int) $property->{$ownerColumn} !== (int) Auth::id()) {
+            abort(403, 'Unauthorized');
+        }
+
+        $property->visited = true;
+        $property->save();
+
+        return redirect()->back()->with('success', 'Properti ditandai sebagai sudah dikunjungi.');
+    }
 }

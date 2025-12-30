@@ -23,6 +23,14 @@
                         </div>
                         <div class="space-y-2 text-right">
                             <a href="{{ route('properties.show', $prop->id) }}" class="text-sm text-blue-600">Detail</a>
+                            @if(!empty($prop->visited))
+                                <div class="text-sm text-green-600 font-semibold">Sudah Dikunjungi</div>
+                            @else
+                                <form action="{{ route('marketing.mark.visited', $prop->id) }}" method="POST">
+                                    @csrf
+                                    <button class="text-sm px-2 py-1 bg-yellow-400 text-black rounded">Tandai Dikunjungi</button>
+                                </form>
+                            @endif
                             <form action="{{ route('marketing.destroy', $prop->id) }}" method="POST">
                                 @csrf
                                 @method('DELETE')

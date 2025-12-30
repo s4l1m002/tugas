@@ -8,7 +8,12 @@
 </head>
 <body class="bg-gray-100 min-h-screen p-8">
     <div class="max-w-5xl mx-auto">
-        <h1 class="text-2xl font-bold mb-4">Properti Menunggu Persetujuan</h1>
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl font-bold">Properti Menunggu Persetujuan</h1>
+            @if(Auth::check() && in_array(Auth::user()->role, ['ketua', 'admin']))
+                <a href="{{ route('admin.reports.index') }}" class="px-3 py-1 bg-indigo-600 text-white rounded">Panel Laporan</a>
+            @endif
+        </div>
 
         @if($properties->isEmpty())
             <div class="p-4 bg-white rounded shadow">Tidak ada properti pending.</div>
