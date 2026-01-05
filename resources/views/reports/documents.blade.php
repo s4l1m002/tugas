@@ -20,7 +20,9 @@
                 <tr>
                     <th class="p-2 text-left">Properti</th>
                     <th class="p-2 text-left">Marketing</th>
-                    <th class="p-2 text-left">Dokumen</th>
+                    <th class="p-2 text-left">IMB</th>
+                    <th class="p-2 text-left">PBB</th>
+                    <th class="p-2 text-left">Sertifikat</th>
                 </tr>
             </thead>
             <tbody>
@@ -28,7 +30,33 @@
                 <tr class="border-t">
                     <td class="p-2">{{ $p->judul }}</td>
                     <td class="p-2">{{ $p->marketing->name ?? 'N/A' }}</td>
-                    <td class="p-2">{{ $p->dokumen ?? 'Tidak ada' }}</td>
+                    <td class="p-2">
+                        @if(isset($p->imb_complete) && $p->imb_complete)
+                            Lengkap
+                        @elseif($p->transactions()->where('status_pembayaran','paid')->exists())
+                            Lengkap
+                        @else
+                            {{ $p->imb ?? $p->dokumen_imb ?? 'Tidak ada' }}
+                        @endif
+                    </td>
+                    <td class="p-2">
+                        @if(isset($p->pbb_complete) && $p->pbb_complete)
+                            Lengkap
+                        @elseif($p->transactions()->where('status_pembayaran','paid')->exists())
+                            Lengkap
+                        @else
+                            {{ $p->pbb ?? $p->dokumen_pbb ?? 'Tidak ada' }}
+                        @endif
+                    </td>
+                    <td class="p-2">
+                        @if(isset($p->sertifikat_complete) && $p->sertifikat_complete)
+                            Lengkap
+                        @elseif($p->transactions()->where('status_pembayaran','paid')->exists())
+                            Lengkap
+                        @else
+                            {{ $p->sertifikat ?? $p->dokumen_sertifikat ?? $p->dokumen ?? 'Tidak ada' }}
+                        @endif
+                    </td>
                 </tr>
                 @endforeach
             </tbody>

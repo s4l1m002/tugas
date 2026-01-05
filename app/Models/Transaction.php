@@ -23,6 +23,12 @@ class Transaction extends Model
         'pembayaran_metode',
         'pembayaran_rekening',
         'bukti',
+        'office_fee',
+        'marketing_gross',
+        'office_share',
+        'marketing_tax',
+        'marketing_net',
+        'buyer_seller_tax',
     ];
 
     public function property()

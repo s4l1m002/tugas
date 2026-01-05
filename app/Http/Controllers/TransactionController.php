@@ -175,11 +175,41 @@ class TransactionController extends Controller
         }
 
         $transaction->status_pembayaran = 'paid';
+
+        // compute fees and taxes and persist
+        $harga = $transaction->harga_jual ?? 0;
+
+        // Office fee: 3% of sale price
+        $officeFee = round(($harga * 3) / 100, 2);
+
+        // Split office fee: 70% marketing, 30% office
+        $marketingGross = round(($officeFee * 70) / 100, 2);
+        $officeShare = round($officeFee - $marketingGross, 2);
+
+        // Marketing tax: 2.5% of marketing gross
+        $marketingTax = round(($marketingGross * 2.5) / 100, 2);
+        $marketingNet = round($marketingGross - $marketingTax, 2);
+
+        // Buyer+Seller tax: 7.5% of sale price
+        $buyerSellerTax = round(($harga * 7.5) / 100, 2);
+
+        $transaction->office_fee = $officeFee;
+        $transaction->marketing_gross = $marketingGross;
+        $transaction->office_share = $officeShare;
+        $transaction->marketing_tax = $marketingTax;
+        $transaction->marketing_net = $marketingNet;
+        $transaction->buyer_seller_tax = $buyerSellerTax;
+
         $transaction->save();
 
-        // update property status to sold
+        // update property status to sold and mark documents complete
         if ($transaction->property) {
-            $transaction->property->update(['status' => 'sold']);
+            $transaction->property->update([
+                'status' => 'sold',
+                'imb_complete' => true,
+                'pbb_complete' => true,
+                'sertifikat_complete' => true,
+            ]);
         }
 
         // notify pelanggan and marketing

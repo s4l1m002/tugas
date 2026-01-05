@@ -23,8 +23,50 @@ class ReportController extends Controller
     public function commissions()
     {
         // simple commission report: komisi_marketing per transaction
-        $transactions = Transaction::with('property')->whereNotNull('komisi_marketing')->orderBy('tanggal_transaksi','desc')->get();
-        return view('reports.commissions', compact('transactions'));
+        // Commission calculation based on harga_jual:
+        // office_fee = 3% of harga_jual
+        // marketing_gross = office_fee * 70%
+        // office_share = office_fee * 30%
+        // marketing_tax = marketing_gross * 2.5%
+        // marketing_net = marketing_gross - marketing_tax
+        $transactions = Transaction::with(['property','marketing'])
+            ->where('status_pembayaran','paid')
+            ->orderBy('tanggal_transaksi','desc')
+            ->get();
+
+        $details = [];
+        $marketingSummary = []; // keyed by marketing_id
+
+        foreach ($transactions as $t) {
+            $harga = floatval($t->harga_jual ?? $t->property->harga ?? 0);
+            $officeFee = $harga * 0.03;
+            $marketingGross = $officeFee * 0.7;
+            $officeShare = $officeFee * 0.3;
+            $marketingTax = $marketingGross * 0.025;
+            $marketingNet = $marketingGross - $marketingTax;
+
+            $details[] = (object) [
+                'transaction' => $t,
+                'harga' => $harga,
+                'office_fee' => $officeFee,
+                'marketing_gross' => $marketingGross,
+                'office_share' => $officeShare,
+                'marketing_tax' => $marketingTax,
+                'marketing_net' => $marketingNet,
+            ];
+
+            $mid = $t->marketing_id ?? ($t->property->marketing_id ?? null);
+            if ($mid) {
+                if (! isset($marketingSummary[$mid])) {
+                    $marketingSummary[$mid] = ['marketing_id' => $mid, 'name' => $t->marketing->name ?? ($t->property->marketing->name ?? 'N/A'), 'gross' => 0, 'tax' => 0, 'net' => 0];
+                }
+                $marketingSummary[$mid]['gross'] += $marketingGross;
+                $marketingSummary[$mid]['tax'] += $marketingTax;
+                $marketingSummary[$mid]['net'] += $marketingNet;
+            }
+        }
+
+        return view('reports.commissions', compact('details','marketingSummary'));
     }
 
     public function visits()
@@ -43,13 +85,19 @@ class ReportController extends Controller
     public function taxes()
     {
         // Placeholder: summarize taxes (not implemented fully)
-        $transactions = Transaction::where('status_pembayaran','paid')->get();
-        return view('reports.taxes', compact('transactions'));
-    }
+        // Show taxes per paid transaction: buyer+seller tax = 7.5% of harga_jual
+        $transactions = Transaction::with('property')->where('status_pembayaran','paid')->orderBy('tanggal_transaksi','desc')->get();
 
-    public function printTransactions()
-    {
-        $transactions = Transaction::with('property')->orderBy('tanggal_transaksi','desc')->get();
-        return view('reports.print_transactions', compact('transactions'));
+        $taxDetails = [];
+        $totalTax = 0;
+        foreach ($transactions as $t) {
+            $harga = floatval($t->harga_jual ?? $t->property->harga ?? 0);
+            $tax = $harga * 0.075; // 7.5%
+            $taxDetails[] = (object)['transaction' => $t, 'harga' => $harga, 'tax' => $tax];
+            $totalTax += $tax;
+        }
+
+        return view('reports.taxes', compact('taxDetails','totalTax'));
     }
 }
+

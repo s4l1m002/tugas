@@ -15,24 +15,55 @@
             </div>
         </div>
 
-        <table class="w-full table-auto text-sm">
+        <h2 class="text-lg font-semibold mb-3">Detail Komisi Per Transaksi</h2>
+        <table class="w-full table-auto text-sm mb-6">
             <thead class="bg-gray-50">
                 <tr>
                     <th class="p-2 text-left">ID</th>
                     <th class="p-2 text-left">Tanggal</th>
                     <th class="p-2 text-left">Properti</th>
                     <th class="p-2 text-left">Marketing</th>
-                    <th class="p-2 text-left">Komisi</th>
+                    <th class="p-2 text-left">Harga</th>
+                    <th class="p-2 text-left">Office Fee (3%)</th>
+                    <th class="p-2 text-left">Marketing Gross (70%)</th>
+                    <th class="p-2 text-left">Marketing Tax (2.5%)</th>
+                    <th class="p-2 text-left">Marketing Net</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($transactions as $t)
+                @foreach($details as $d)
                 <tr class="border-t">
-                    <td class="p-2">{{ $t->id }}</td>
-                    <td class="p-2">{{ $t->tanggal_transaksi }}</td>
-                    <td class="p-2">{{ $t->property->judul ?? 'Properti #' . $t->property_id }}</td>
-                    <td class="p-2">{{ $t->marketing->name ?? 'N/A' }}</td>
-                    <td class="p-2">Rp {{ number_format($t->komisi_marketing ?? 0,0,',','.') }}</td>
+                    <td class="p-2">{{ $d->transaction->id }}</td>
+                    <td class="p-2">{{ $d->transaction->tanggal_transaksi }}</td>
+                    <td class="p-2">{{ $d->transaction->property->judul ?? 'Properti #' . $d->transaction->property_id }}</td>
+                    <td class="p-2">{{ $d->transaction->marketing->name ?? ($d->transaction->property->marketing->name ?? 'N/A') }}</td>
+                    <td class="p-2">Rp {{ number_format($d->harga,0,',','.') }}</td>
+                    <td class="p-2">Rp {{ number_format($d->office_fee,0,',','.') }}</td>
+                    <td class="p-2">Rp {{ number_format($d->marketing_gross,0,',','.') }}</td>
+                    <td class="p-2">Rp {{ number_format($d->marketing_tax,0,',','.') }}</td>
+                    <td class="p-2">Rp {{ number_format($d->marketing_net,0,',','.') }}</td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+
+        <h2 class="text-lg font-semibold mb-3">Ringkasan Pajak & Komisi per Marketing</h2>
+        <table class="w-full table-auto text-sm">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="p-2 text-left">Marketing</th>
+                    <th class="p-2 text-left">Total Gross</th>
+                    <th class="p-2 text-left">Total Pajak</th>
+                    <th class="p-2 text-left">Total Net</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($marketingSummary as $m)
+                <tr class="border-t">
+                    <td class="p-2">{{ $m['name'] ?? $m['marketing_id'] }}</td>
+                    <td class="p-2">Rp {{ number_format($m['gross'],0,',','.') }}</td>
+                    <td class="p-2">Rp {{ number_format($m['tax'],0,',','.') }}</td>
+                    <td class="p-2">Rp {{ number_format($m['net'],0,',','.') }}</td>
                 </tr>
                 @endforeach
             </tbody>
