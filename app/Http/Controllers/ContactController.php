@@ -120,9 +120,5 @@ class ContactController extends Controller
         return back()->with('success', 'Kontak ditandai sudah dihubungi.');
     }
 
-    /**
-     * Catatan: Untuk melihat pesan kontak, fungsionalitasnya
-     * biasanya ada di MarketingController (untuk melihat pesan yang masuk ke dia)
-     * atau AdminController (untuk melihat semua pesan).
-     */
+
 }

@@ -97,6 +97,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/transaction/{property}', [TransactionController::class, 'store'])->name('transactions.store');
         // Admin confirm transaction (mark as paid)
         Route::post('/transaction/{transaction}/confirm', [TransactionController::class, 'adminConfirm'])->name('transactions.confirm.admin');
+        // Admin reject transaction (mark as rejected)
+        Route::post('/transaction/{transaction}/reject', [TransactionController::class, 'adminReject'])->name('transactions.reject.admin');
 
         // ROUTE LAPORAN KHUSUS KETUA
         Route::middleware('can:isKetuaOrAdmin')->prefix('reports')->name('reports.')->group(function () {

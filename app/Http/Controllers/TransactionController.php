@@ -76,6 +76,7 @@ class TransactionController extends Controller
         $request->validate([
             'payment_method' => 'required|in:cash,transfer',
             'rekening' => 'nullable|string',
+            'bukti' => 'required_if:payment_method,transfer|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
 
         $user = auth()->user();
@@ -105,6 +106,15 @@ class TransactionController extends Controller
             'pembayaran_metode' => $request->input('payment_method'),
             'pembayaran_rekening' => $request->input('rekening'),
         ]);
+
+        // If transfer, store bukti file (validation required_if ensures presence)
+        if ($request->hasFile('bukti') && $request->file('bukti')->isValid()) {
+            $file = $request->file('bukti');
+            $name = 'bukti_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            \Illuminate\Support\Facades\Storage::disk('public')->putFileAs('payments', $file, $name);
+            $tx->bukti = 'storage/payments/' . $name;
+            $tx->save();
+        }
 
         // Notify admin, ketua, marketing
         $notifiables = \App\Models\User::whereIn('role', ['admin','ketua'])->get();
@@ -229,6 +239,39 @@ class TransactionController extends Controller
         return back()->with('success', 'Transaksi telah dikonfirmasi sebagai LUNAS.');
     }
 
+    // Admin rejects a submitted transaction (payment not accepted)
+    public function adminReject(Request $request, Transaction $transaction)
+    {
+        $user = $request->user();
+        if (! $user || ! in_array($user->role, ['admin','ketua'])) {
+            abort(403);
+        }
+
+        $transaction->status_pembayaran = 'rejected';
+        $transaction->save();
+
+        // revert property to published (visible)
+        if ($transaction->property) {
+            $transaction->property->update(['status' => 'published']);
+        }
+
+        // notify pelanggan and marketing
+        $notifiables = collect();
+        if ($transaction->pelanggan_id) {
+            $notifiables->push(\App\Models\User::find($transaction->pelanggan_id));
+        }
+        if ($transaction->marketing) {
+            $notifiables->push($transaction->marketing);
+        }
+
+        foreach ($notifiables as $n) {
+            if (! $n) continue;
+            try { $n->notify(new \App\Notifications\PaymentRejected($transaction)); } catch (\Throwable $e) { \Log::error($e->getMessage()); }
+        }
+
+        return redirect()->route('admin.pending')->with('success', 'Transaksi ditolak — properti dikembalikan ke katalog dan pemberitahuan telah dikirim.');
+    }
+
     // Show form for pelanggan to create a new transaction (select property + payment)
     public function createForCustomer(Request $request)
     {
@@ -254,6 +297,7 @@ class TransactionController extends Controller
             'property_id' => 'required|exists:properties,id',
             'payment_method' => 'required|in:cash,transfer',
             'rekening' => 'nullable|string',
+            'bukti' => 'required_if:payment_method,transfer|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
 
         $property = Property::find($validated['property_id']);

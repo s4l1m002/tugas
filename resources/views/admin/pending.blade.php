@@ -66,7 +66,7 @@
                                     @csrf
                                     <button class="px-3 py-1 bg-green-600 text-white rounded">Konfirmasi Lunas</button>
                                 </form>
-                                <form action="{{ route('admin.reject', $tx->property_id) }}" method="POST">
+                                <form action="{{ route('admin.transactions.reject.admin', $tx->id) }}" method="POST">
                                     @csrf
                                     <button class="px-3 py-1 bg-red-500 text-white rounded">Tolak</button>
                                 </form>
